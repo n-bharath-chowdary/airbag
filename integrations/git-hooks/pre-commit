@@ -1,0 +1,48 @@
+#!/bin/sh
+# Airbag pre-commit hook.
+# Blocks the commit when secrets, repo waste, or broken code are staged.
+#
+# Bypass once:  AIRBAG_DISABLE=1 git commit ...   (or: git commit --no-verify)
+# Warn->block:  AIRBAG_STRICT=1  git commit ...
+
+if [ -n "$AIRBAG_DISABLE" ]; then
+  exit 0
+fi
+
+AB_PYTHON="python"
+AB_SCRIPT=""
+
+# If the vendored launcher was deleted, python would exit 2 - indistinguishable
+# from "blocked". Skip cleanly rather than blocking every commit.
+if [ -n "$AB_SCRIPT" ] && [ ! -f "$AB_SCRIPT" ]; then
+  echo "airbag: $AB_SCRIPT is missing - skipping the check." >&2
+  exit 0
+fi
+
+run_airbag() {
+  if [ -n "$AB_SCRIPT" ]; then
+    "$AB_PYTHON" "$AB_SCRIPT" "$@"
+  else
+    airbag "$@"
+  fi
+}
+
+if [ -n "$AIRBAG_STRICT" ]; then
+  run_airbag scan --staged --stage commit --strict
+else
+  run_airbag scan --staged --stage commit
+fi
+code=$?
+
+if [ "$code" -eq 3 ]; then
+  echo "airbag: could not run; allowing the commit." >&2
+  exit 0
+fi
+
+if [ "$code" -eq 2 ]; then
+  echo ""
+  echo "airbag: commit blocked. Fix the items above, or bypass with --no-verify."
+  exit 1
+fi
+
+exit 0

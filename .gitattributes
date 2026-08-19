@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+# Git hooks must keep LF endings or /bin/sh cannot execute them.
+integrations/git-hooks/* text eol=lf
+*.sh text eol=lf
+
+# Keep binary fixtures untouched.
+*.png binary
+*.jpg binary

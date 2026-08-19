@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+htmlcov/
+.coverage
+
+# Environments and credentials
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.idea/
+.vs/
+
+# Logs
+*.log
+
+# Airbag's own repo: the vendored launcher is redundant here because the
+# package is the repo. In YOUR project, commit .airbag/hook.py so every
+# clone gets the same gate.
+.airbag/

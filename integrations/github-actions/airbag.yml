@@ -1,0 +1,32 @@
+name: Airbag
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  airbag:
+    name: Secret / waste / quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Airbag
+        run: pip install git+https://github.com/n-bharath-chowdary/airbag
+
+      - name: Scan the incoming changes
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            airbag scan \
+              --range "origin/${{ github.base_ref }}..HEAD" \
+              --stage push
+          else
+            airbag scan --stage push
+          fi

@@ -1,0 +1,49 @@
+#!/bin/sh
+# Airbag pre-push hook.
+# Runs the full gate against the commits you are about to publish.
+#
+# Bypass once:  AIRBAG_DISABLE=1 git push ...     (or: git push --no-verify)
+
+# git feeds the refs being pushed on stdin; drain it so git does not see EPIPE.
+cat > /dev/null
+
+if [ -n "$AIRBAG_DISABLE" ]; then
+  exit 0
+fi
+
+AB_PYTHON="python"
+AB_SCRIPT=""
+
+if [ -n "$AB_SCRIPT" ] && [ ! -f "$AB_SCRIPT" ]; then
+  echo "airbag: $AB_SCRIPT is missing - skipping the check." >&2
+  exit 0
+fi
+
+run_airbag() {
+  if [ -n "$AB_SCRIPT" ]; then
+    "$AB_PYTHON" "$AB_SCRIPT" "$@"
+  else
+    airbag "$@"
+  fi
+}
+
+run_airbag scan --stage push
+code=$?
+
+if [ "$code" -eq 3 ]; then
+  echo "airbag: could not run; allowing the push." >&2
+  exit 0
+fi
+
+if [ "$code" -eq 2 ]; then
+  echo ""
+  echo "airbag: push blocked. Fix the items above, or bypass with --no-verify."
+  exit 1
+fi
+
+if [ "$code" -eq 1 ]; then
+  echo ""
+  echo "airbag: warnings above were not blocking. Pushing."
+fi
+
+exit 0

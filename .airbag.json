@@ -1,0 +1,11 @@
+{
+  // Airbag's own configuration.
+  //
+  // tests/ contains fabricated credentials and deliberately unsafe snippets
+  // that exist purely so the detectors can be tested against them. Allowing
+  // the path is the intended way to handle a fixture directory - see the
+  // README section on suppressing false positives.
+  "allow": {
+    "paths": ["tests/**"]
+  }
+}
