@@ -138,11 +138,18 @@ def install_git(root: str, force: bool) -> List[str]:
 
 def install_claude(root: str, force: bool) -> List[str]:
     log = install_launcher(root, force)
-    # The skill teaches the agent the workflow; the hook enforces it even when
-    # the agent forgets. Install both.
+    # Three layers, because each covers a different failure mode:
+    #   skill   - the agent knows the workflow and follows it on its own
+    #   command - you can ask for a check explicitly with /airbag
+    #   hook    - it happens anyway, even if the agent ignores both
     log.append(_write(
         os.path.join(root, ".claude", "skills", "airbag", "SKILL.md"),
         templates.SKILL_MD,
+        force,
+    ))
+    log.append(_write(
+        os.path.join(root, ".claude", "commands", "airbag.md"),
+        templates.SLASH_COMMAND,
         force,
     ))
     settings_path = os.path.join(root, ".claude", "settings.json")

@@ -57,6 +57,8 @@ FILES = {
         '}\n'
     ),
     "skills/airbag/SKILL.md": templates.SKILL_MD,
+    "commands/airbag.md": templates.SLASH_COMMAND,
+    "integrations/claude-code/airbag.command.md": templates.SLASH_COMMAND,
     ".airbag.example.json": templates.CONFIG_EXAMPLE,
 }
 

@@ -138,14 +138,20 @@ Install one integration at a time with `airbag install claude`,
 airbag install claude
 ```
 
-This installs **two** things, and you want both:
+This installs **three** things, and you want all of them — each covers a
+different way the check could fail to happen:
 
 1. **The skill** → `.claude/skills/airbag/SKILL.md`
-   Teaches Claude the workflow: scan first, explain findings in plain language,
-   ask before fixing, never bypass silently.
-2. **A `PreToolUse` hook** → `.claude/settings.json`
-   Enforces it even when the model forgets. Every Bash command is inspected;
-   if it is a `git commit` or `git push`, the scan runs first.
+   Teaches Claude the workflow, so it checks *on its own initiative* when you
+   say "push this": scan first, explain findings in plain language, ask before
+   fixing, never bypass silently.
+2. **The `/airbag` command** → `.claude/commands/airbag.md`
+   For when *you* want to check, at any moment — not just at push time.
+   `/airbag`, `/airbag push`, `/airbag all`, or `/airbag fix`.
+3. **A `PreToolUse` hook** → `.claude/settings.json`
+   The one that does not rely on cooperation. Every Bash command is inspected;
+   if it is a `git commit` or `git push`, the scan runs first no matter what
+   the model intended.
 
 | Result | What Claude Code does |
 |---|---|
@@ -153,12 +159,16 @@ This installs **two** things, and you want both:
 | warnings | You get a permission prompt listing the warnings, so **you** decide. |
 | blockers | The command is refused, and Claude is handed the exact list of what to fix. |
 
-To use the skill globally across all your projects instead of per-repo, copy it
-into your user skills directory:
+To get the skill and `/airbag` in **every** project instead of one repo, copy
+them into your user directories once:
 
 ```bash
-cp -r skills/airbag ~/.claude/skills/
+cp -r skills/airbag   ~/.claude/skills/
+cp    commands/airbag.md ~/.claude/commands/
 ```
+
+The hook still has to be installed per repository (`airbag install claude`),
+since it is the layer that touches that repo's git.
 
 ### Cursor / Windsurf
 
@@ -194,6 +204,17 @@ airbag install ci          # .github/workflows/airbag.yml
 ---
 
 ## Using it directly
+
+Inside Claude Code, just type:
+
+```
+/airbag              # check what is pending right now
+/airbag push         # check everything you are about to push
+/airbag all          # audit the whole repository
+/airbag fix          # check, then apply the safe fixes you approve
+```
+
+From any terminal:
 
 ```bash
 airbag scan                      # staged changes (default)
@@ -322,6 +343,12 @@ on its own initiative.
   it. Pair it with GitHub's push protection and provider-side secret scanning.
 - **It only sees what git sees.** Files that are already ignored, or changes
   you have not staged, are outside the default scope.
+- **It does not detect "unnecessary code" in general.** It has no opinion on
+  whether your agent wrote 200 lines where 20 would do, and it cannot find
+  dead functions or redundant abstractions — that is a much harder problem and
+  a different tool. What it catches is a specific, enumerable list: leftover
+  debug statements, elided code, unimplemented stubs, junk and scratch files.
+  Use `/code-review` or a linter for the rest.
 - **Test execution is opt-in.** Running a repository's test command executes
   arbitrary code from that repository, so Airbag detects your suite and
   reports that it has not run, but will not run it unless you pass
