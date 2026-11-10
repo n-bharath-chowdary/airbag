@@ -16,9 +16,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 3.8 is not available on the newest Ubuntu image, so the oldest supported version runs on 22.04.
+          # 3.8 and 3.9 are not available on the newest Ubuntu image, so the oldest versions run on 22.04.
           - { os: ubuntu-22.04, python: "3.8" }
-          - { os: ubuntu-latest, python: "3.9" }
+          - { os: ubuntu-22.04, python: "3.9" }
           - { os: ubuntu-latest, python: "3.10" }
           - { os: ubuntu-latest, python: "3.11" }
           - { os: ubuntu-latest, python: "3.12" }
