@@ -6,6 +6,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/n-bharath-chowdary/airbag/actions/workflows/ci.yml"><img src="https://github.com/n-bharath-chowdary/airbag/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/python-3.8%2B-blue.svg" alt="Python 3.8+">
   <img src="https://img.shields.io/badge/dependencies-0-brightgreen.svg" alt="Zero dependencies">
